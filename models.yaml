@@ -1,0 +1,24 @@
+models:
+  -
+    name: VGG16
+    description: Classic object recognition model
+    type: Object Recognition
+    size: 528
+    reference: https://arxiv.org/abs/1409.1556
+
+  -
+    name: Inception V3
+    description: Classic object recognition model
+    type: Object Recognition
+    size: 92
+    reference: https://arxiv.org/abs/1512.00567
+
+  -
+    name: Mobile Net
+    description: Suited for mobile devices
+    type: Object Recognition
+    size: 17
+    reference: https://arxiv.org/pdf/1704.04861.pdf
+
+
+
