@@ -1,0 +1,18 @@
+<div class="about">
+    <h2 class="about_sub-headline">Demo</h2>
+    <form enctype = "multipart/form-data">
+        <input type="file" ngf-select ng-model="picFile" name="file" ngf-accept="'image/*'" required>
+
+        <div>
+            <img ngf-src="picFile" class="thumb" width="300">
+        </div>
+        <input type="submit" ng-click="uploadImage(picFile)"/>
+    </form>
+
+    <div>
+        <ul>
+            <li ng-repeat="item in predictions">{{item.class}}: {{item.score}}</li>
+        </ul>
+    </div>
+
+</div>

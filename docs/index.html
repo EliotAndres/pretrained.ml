@@ -1,12 +1,13 @@
 <!doctype html>
 <html ng-app="app">
 <head>
-    <title>Pre-trained deep learning models - pretrained.ml</title>
+    <title>State Of The Art Deep Learning Models With Demos - stateoftheart.ml</title>
     <meta charset="UTF-8">
 
-    <link href="image/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <link href="image/favicon2.png" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="vendors/tablesort.css" />
+    <link rel="stylesheet" href="vendors/popeye.min.css" />
     <link rel="stylesheet" href="style.css" />
 </head>
 <body ng-controller="MainController">
@@ -19,7 +20,7 @@
 <div class="container" role="main">
     <div class="jumbotron">
         <h1>State Of The Art Machine Learning</h1>
-        <h4>Sortable and searchable compilation of pre-trained deep learning models. With demos.</h4>
+        <h4>Sortable and searchable compilation of pre-trained deep learning models. With demos and code.</h4>
         <p>Pretrained models are deep learning model weights that you can download and use without training</p>
         <p></p>
         <p>
@@ -50,26 +51,27 @@
         <table class="table" ts-wrapper>
             <thead>
             <tr>
-                <th>Type</th>
-                <th ts-criteria="competitionTitle | lowercase">Name</th>
                 <th ts-criteria="type">Type</th>
+                <th ts-criteria="subtype">Subtype</th>
+                <th ts-criteria="name | lowercase">Name</th>
                 <th ts-criteria="size | parseFloat" style="min-width: 100px;">Size</th>
-                <th ts-criteria="links" style="min-width: 100px;">Reference</th>
+                <th style="min-width: 100px;">Reference</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="model in models | filter:search:strict" ts-repeat>
-                <td>
-                    <img ng-src="https://raw.githubusercontent.com/likedan/Awesome-CoreML-Models/master/images/coreml.png" alt="Logo" width="100"/>
+                <td style="text-align: center">
+                    <img ng-src="image/{{icons[model.type]}}" alt="Logo" width="50"/>
+                    <div>{{model.type}}</div>
                 </td>
+                <td>{{model.subtype}}</td>
                 <td>
-                    <h4><a target="_blank" ng-href="https://www.kaggle.com{{competition.competitionUrl}}">{{model.name}}</a></h4>
+                    <h4>{{model.name}}</h4>
                     <p>{{model.description}}</p>
                 </td>
-                <td>{{model.type}}</td>
                 <td>{{model.size}} MB</td>
                 <td><a target="_blank" ng-href="{{model.reference}}">Reference</a> //
-                    <a target="_blank" ng-href="{{model.demo}}">Demo</a></td>
+                    <a ng-href="" class="link" ng-click="openModal()">Demo</a></td>
             </tr>
             </tbody>
         </table>
@@ -77,9 +79,11 @@
 
 </div> <!-- /container -->
 
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.js"></script>
 <script src="vendors/angular-tablesort.js"></script>
 <script src="vendors/js-yaml.min.js"></script>
+<script src="vendors/ng-file-upload.min.js"></script>
+<script src="vendors/popeye.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

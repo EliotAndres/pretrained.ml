@@ -1,0 +1,35 @@
+models:
+  -
+    name: VGG16
+    description: Classic object recognition model
+    type: Computer Vision
+    subtype: Object Recognition
+    size: 528
+    reference: https://arxiv.org/abs/1409.1556
+
+  -
+    name: Inception V3
+    description: Classic object recognition model
+    type: Computer Vision
+    subtype: Object Recognition
+    size: 92
+    reference: https://arxiv.org/abs/1512.00567
+
+  -
+    name: Mobile Net
+    description: Suited for mobile devices
+    type: Computer Vision
+    subtype: Object Recognition
+    size: 17
+    reference: https://arxiv.org/pdf/1704.04861.pdf
+
+  -
+    name: Unsupervised Sentiment Neuron
+    description: A system which learns an excellent representation of sentiment, despite being trained only to predict the next character in the text of Amazon reviews.
+    type: Natural Language Processing
+    subtype: Sentiment Analysis
+    reference: https://blog.openai.com/unsupervised-sentiment-neuron/
+
+
+
+

@@ -1,0 +1,12 @@
+/**
+* angular-popeye
+* A simple modal library for AngularJS applications
+
+* @author Pathgather <tech@pathgather.com>
+* @copyright Pathgather 2015
+* @license MIT
+* @link https://github.com/Pathgather/popeye
+* @version 1.0.5
+*/
+
+body.popeye-modal-open{overflow:hidden}.popeye-modal-container{position:fixed;bottom:0;left:0;right:0;top:0;z-index:1;overflow-y:auto;background-color:rgba(76,147,234,.7);text-align:center}.popeye-modal-container.ng-enter{-webkit-animation:c .4s;animation:c .4s}.popeye-modal-container.ng-enter .popeye-modal{-webkit-animation:a .4s;animation:a .4s}.popeye-modal-container.ng-leave{-webkit-animation:d .4s;animation:d .4s}.popeye-modal-container.ng-leave .popeye-modal{-webkit-animation:b .4s forwards;animation:b .4s forwards}.popeye-modal-container:before{content:'';display:inline-block;height:100%;vertical-align:middle}.popeye-modal-container .popeye-modal{position:relative;text-align:left;vertical-align:middle;display:inline-block;width:60%;border-radius:3px;border:none;z-index:2;padding:2em 1.5em 1.5em;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.4)}.popeye-modal-container .popeye-modal a.popeye-close-modal{position:absolute;top:1em;right:1em;font-weight:100;text-decoration:none;color:inherit}.popeye-modal-container .popeye-modal a.popeye-close-modal:after{content:"\d7"}@-webkit-keyframes a{0%{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}}@keyframes a{0%{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}}@-webkit-keyframes b{0%{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}to{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}}@keyframes b{0%{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}to{opacity:0;-webkit-transform:translateY(100%);transform:translateY(100%)}}@-webkit-keyframes c{0%{opacity:0}to{opacity:1}}@keyframes c{0%{opacity:0}to{opacity:1}}@-webkit-keyframes d{0%{opacity:1}to{opacity:0}}@keyframes d{0%{opacity:1}to{opacity:0}}
