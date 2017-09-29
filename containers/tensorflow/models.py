@@ -13,6 +13,14 @@ from keras.applications.inception_v3 import InceptionV3
 from keras.applications.inception_v3 import preprocess_input as preprocess_input_inception,\
     decode_predictions as decode_predictions_inception
 
+# For reviews sentiment analysis
+import os, sys
+path = os.path.abspath('./reviews')
+os.chdir(path)
+sys.path.insert(0, path)
+
+from encoder import Model as SentimentModel
+
 from keras.preprocessing import image as keras_image
 import numpy as np
 
@@ -94,4 +102,16 @@ class InceptionV3Wrapper(object):
 
         return json.dumps(clean_predictions)
 
+class ReviewSentimentWrapper(object):
+    def __init__(self):
+        logger.info('Loading Review sentiment')
+        self.model = SentimentModel()
+
+    def predict(self, text):
+        text = [' This is very bad', ' This is very Good']
+        text_features = self.model.transform([text])
+        # For more info https://github.com/openai/generating-reviews-discovering-sentiment/issues/2
+        sentiment = text_features[0, 2388]
+
+        return json.dumps({'sentiment': str(sentiment)})
 

@@ -4,12 +4,13 @@ from PIL import Image
 
 import logging
 
-from models import VGG16Wrapper, MobileNetWrapper, InceptionV3Wrapper
+from models import VGG16Wrapper, MobileNetWrapper, InceptionV3Wrapper, ReviewSentimentWrapper
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
 
 ERROR_NO_IMAGE = 'Please provide an image'
+ERROR_NO_TEXT = 'Please provide some text'
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +18,7 @@ CORS(app)
 vgg16 = VGG16Wrapper()
 mobilenet = MobileNetWrapper()
 inception = InceptionV3Wrapper()
+review_sentiment = ReviewSentimentWrapper()
 
 
 def handle_image(request):
@@ -31,6 +33,17 @@ def handle_image(request):
 
     img = Image.open(file)
     return img
+
+
+def handle_text(request):
+    if 'text' not in request.form:
+        abort(400, ERROR_NO_TEXT)
+
+    text = request.form['text']
+    if len(text) < 1:
+        abort(400, ERROR_NO_TEXT)
+
+    return text
 
 
 @app.route('/vgg16', methods=['POST'])
@@ -51,6 +64,13 @@ def mobilenet_route():
 def inception_route():
     img = handle_image(request)
     predictions = inception.predict(img)
+
+    return predictions
+
+@app.route('/review-sentiment', methods=['POST'])
+def review_sentiment_route():
+    text = handle_image(request)
+    predictions = review_sentiment.predict(text)
 
     return predictions
 

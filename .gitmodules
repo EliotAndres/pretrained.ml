@@ -1,0 +1,3 @@
+[submodule "containers/tensorflow/reviews"]
+	path = containers/tensorflow/reviews
+	url = https://github.com/openai/generating-reviews-discovering-sentiment
