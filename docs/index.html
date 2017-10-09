@@ -71,7 +71,7 @@
                 </td>
                 <td>{{model.size}} MB</td>
                 <td><a target="_blank" ng-href="{{model.reference}}">Reference</a> //
-                    <a ng-href="" class="link" ng-click="openModal(model)">Demo</a></td>
+                    <a ng-href="" ng-if="model.demoUrl" class="link" ng-click="openModal(model)">Demo</a></td>
             </tr>
             </tbody>
         </table>

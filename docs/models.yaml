@@ -37,13 +37,17 @@ models:
 
   -
     name: DeepLab-ResNet
-    description: A system which learns an excellent representation of sentiment, despite being trained only to predict the next character in the text of Amazon reviews.
+    description: Semantic segmentation by atrous convolution, multi-scale inputs with max-pooling to merge the results from all scales, and atrous spatial pyramid pooling. The model has been pretrained on MS-COCO dataset.
     type: Computer Vision
     subtype: Semantic Segmentation
     size: 177
     reference: https://github.com/DrSleep/tensorflow-deeplab-resnet
     demoUrl: 'deeplab'
 
-
-
-
+  -
+    name: Faster-RCNN
+    description:  A convnet for object detection with a region proposal network
+    type: Computer Vision
+    subtype: Object Detection
+    size: TODO
+    reference: https://github.com/smallcorgi/Faster-RCNN_TF
