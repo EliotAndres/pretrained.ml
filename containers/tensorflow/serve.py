@@ -1,10 +1,11 @@
-from flask import Flask, request, redirect, url_for, abort
+from flask import Flask, request, redirect, url_for, abort, send_from_directory
 from flask_cors import CORS
 from PIL import Image
 
 import logging
 
-from models import VGG16Wrapper, MobileNetWrapper, InceptionV3Wrapper, ReviewSentimentWrapper
+from models import VGG16Wrapper, MobileNetWrapper,\
+    InceptionV3Wrapper, ReviewSentimentWrapper, DeeplabWrapper
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
@@ -19,6 +20,7 @@ vgg16 = VGG16Wrapper()
 mobilenet = MobileNetWrapper()
 inception = InceptionV3Wrapper()
 review_sentiment = ReviewSentimentWrapper()
+deeplab = DeeplabWrapper()
 
 
 def handle_image(request):
@@ -69,9 +71,20 @@ def inception_route():
 
 @app.route('/review-sentiment', methods=['POST'])
 def review_sentiment_route():
-    text = handle_image(request)
+    text = handle_text(request)
     predictions = review_sentiment.predict(text)
 
     return predictions
+
+@app.route('/deeplab', methods=['POST'])
+def deeplab_route():
+    img = handle_image(request)
+    predictions = deeplab.predict(img)
+
+    return predictions
+
+@app.route('/outputs/<path:path>')
+def send_js(path):
+    return send_from_directory('outputs', path)
 
 app.run(debug=False, host='0.0.0.0', port=8091)

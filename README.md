@@ -1,41 +1,43 @@
-# Kaggle Past Solutions
-A searchable and sortable compilation of [Kaggle](https://www.kaggle.com/) past solutions. [Website](http://ndres.me/kaggle-past-solutions/)
+# pretrained.ml
+Sortable and searchable compilation of pre-trained deep learning models. With demos and code.
 
 ## About
-If you are facing a data science problem or just want to learn, there is a good chance that you can find inspiration here !
+Having spent too much time installing deep learning models just to evaluate their performance, I created this repo for several reasons:
+ - Access a free demo of deep learning models
+ - Get a docker container running the model for a quick install
+ - Gather all the deep learning models available
+
+## Installation
+
+    git clone https://github.com/EliotAndres/pretrained.ml
+    cd containers/tensorflow
+    sudo docker build . -t keras
+    docker run -dit -p 0.0.0.0:8081:8091 -t keras
+
+## Useful commands
+    docker ps #list images
+    docker attach [container_id] #attach a shell to specific image
 
 ## Contributing
-Many competitions are missing links to their solutions, evaluation and type.
+Many models are missing. Any help is welcome ! You have two options to contribute.
 
-To contribute:
+Easy way: Add a model to the list without a demo:
  - Fork the repo
- - Edit the **competitions.json** file (you can even edit it with Github's editor)
+ - Edit the **docs/models.yaml** file (you can even edit it with Github's editor)
  - Make a pull request
 
-For each competition missing the data, please add the following fields:
+Other way: add a model with a demo:
+ - Fork the repo
+ - Add the model inside one of the docker containers
+ - Create a route in the serve.py file
+ - Add a demo calling the route
+ - Make a pull request
 
-    "types": [],
-    "evaluation": "",
-    "solutions": [
-      {
-        "label": "",
-        "url": ""
-      }
-    ]
-Evaluation should contain the name of the evaluation metric and its abreviation (if applicable).
-The solutions should be links to the Kaggle forum (if possible) or blog posts.
 
-For instance, you might add:
-
-    "types": ["Image Detection", "Classification"],
-    "evaluation": "Multi-class logarithmic loss (logloss)",
-    "solutions": [
-      {
-        "label": "#1 Solution",
-        "url": "https://www.kaggle.com/c/state-farm-distracted-driver-detection/forums/t/22906/a-brief-summary"
-      },
-      {
-        "label": "#3 Solution",
-        "url": "https://www.kaggle.com/c/state-farm-distracted-driver-detection/forums/t/22631/3-br-power-solution"
-      }
-    ]
+## Todos
+- [ ] Use nvidia-docker ?
+- [ ] Add flag to compile Tensorflow
+- [ ] Consider splitting each model in a different container ?
+- [ ] Add queuing system
+- [ ] Linter
+- [ ] Resize images for segmentation

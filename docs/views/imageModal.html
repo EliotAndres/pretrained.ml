@@ -1,0 +1,63 @@
+<div class="about">
+    <h2 class="about_sub-headline">Demo for {{currentModel.name}}</h2>
+    <div class="row">
+        <div class="col-sm-6 text-center">
+            <form enctype = "multipart/form-data">
+                <div ngf-drop ng-hide="image"
+                     class="drop-box" type="file"
+                     ng-model="image"
+                     ngf-select name="file" ngf-accept="'image/*'"
+                     ngf-drop-available="dropAvailable"
+                     ngf-change="uploadImage($files, $file)">
+                    Select <span ng-show="dropAvailable"> or drop </span>image
+                </div>
+                <div>
+                    <img ngf-src="image" class="thumb" width="200">
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-6">
+
+            <div ng-if="uploadProgress && uploadProgress < 99">
+                <p>
+                    Uploading image
+                </p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="{{uploadProgress}}" aria-valuemin="0" aria-valuemax="100" ng-style="{'width': uploadProgress + '%'}">
+                        {{uploadProgress}}%
+                    </div>
+                </div>
+            </div>
+
+
+            <div ng-if="uploadProgress && uploadProgress >= 99 && !predictions">
+                <p>
+                    Computing predictions ...
+                </p>
+            </div>
+
+            <!--If the model returns scores-->
+            <div ng-repeat="item in predictions" ng-if="item.score > 0.0001">
+                <div>
+                    <span>{{item.class}}</span>
+                    <span class="score">{{item.score*100 | number : 2}}%</span>
+                </div>
+                <div class="progress progress-small">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{item.score}}" aria-valuemin="0" aria-valuemax="100" ng-style="{'width': {{item.score*100}} + '%'}">
+                    </div>
+                </div>
+            </div>
+
+            <!--If the model returns an image-->
+            <div ng-if="predictions.output" class="segmentation">
+                <img ng-src="{{serverUrl + predictions.output}}" class="segmentation-image" alt="">
+                <img src="image/colour_scheme.png" class="segmentation-legend" alt="">
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+</div>

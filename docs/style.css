@@ -12,3 +12,45 @@
 .popeye-modal-container {
     background: linear-gradient(-150deg, rgba(49, 255, 182, 0.7), rgba(81, 179, 236, 0.64)) fixed;
 }
+
+.drop-box {
+    background: #F8F8F8;
+    border: 5px dashed #DDD;
+    width: 200px;
+    text-align: center;
+    padding: 50px 10px;
+    margin-left: 10px;
+}
+
+.up-buttons {
+    float: right;
+}
+
+.drop-box.dragover {
+    border: 5px dashed blue;
+}
+
+.drop-box.dragover-err {
+    border: 5px dashed red;
+}
+
+.progress-small {
+    height: 10px;
+}
+
+.score {
+    float: right;
+}
+
+.segmentation {
+    text-align: center;
+}
+
+.segmentation-image {
+    width: 50%;
+    max-width: 250px;
+}
+
+.segmentation-legend {
+    width: 100%;
+}

@@ -1,0 +1,36 @@
+<div class="about">
+    <h2 class="about_sub-headline">Demo for {{currentModel.name}}</h2>
+    <div class="row">
+        <div class="col-sm-6">
+            <form enctype = "multipart/form-data">
+                <textarea class="form-control" ng-model="text" rows="3"></textarea>
+                <button class="btn btn-default" ng-click="sendText(text)">Submit</button>
+            </form>
+        </div>
+        <div class="col-sm-6">
+
+
+            <div ng-if="loading && !predictions">
+                <p>
+                    Computing predictions ...
+                </p>
+            </div>
+
+            <div ng-if="predictions">
+
+                <div>
+                    <div class="progress progress-success">
+                        <div class="progress-bar" ng-class="{'progress-bar-danger': predictions.sentiment < 0}"
+                             ng-style="{'width': (predictions.sentiment | abs) * 100 + '%'}"></div>
+                    </div>
+                    <div>Sentiment score: {{predictions.sentiment | number : 4}}</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+</div>
