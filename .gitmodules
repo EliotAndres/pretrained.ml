@@ -3,4 +3,4 @@
 	url = https://github.com/openai/generating-reviews-discovering-sentiment
 [submodule "containers/tensorflow/deeplab_resnet"]
 	path = containers/tensorflow/deeplab_resnet
-	url = git@github.com:EliotAndres/tensorflow-deeplab-resnet.git
+	url = https://github.com/EliotAndres/tensorflow-deeplab-resnet
