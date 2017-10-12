@@ -114,13 +114,14 @@ class InceptionV3Wrapper(object):
 class ReviewSentimentWrapper(object):
     def __init__(self):
         logger.info('Loading Review sentiment')
-        tf.reset_default_graph()
-        current_directory = os.getcwd()
+        self.g = tf.Graph()
+        with self.g.as_default():
+            current_directory = os.getcwd()
 
-        # Necessary as the model is imported with relative path
-        os.chdir(reviews_path)
-        self.model = SentimentModel()
-        os.chdir(current_directory)
+            # Necessary as the model is imported with relative path
+            os.chdir(reviews_path)
+            self.model = SentimentModel()
+            os.chdir(current_directory)
 
     def predict(self, text):
         text_features = self.model.transform([text])
@@ -136,23 +137,24 @@ class DeeplabWrapper(object):
 
     def __init__(self):
         logger.info('Loading Deeplab')
-        tf.reset_default_graph()
-        self.image_placeholder = tf.placeholder(tf.float32, shape=(None, None, None, 3))
-        self.net = DeepLabResNetModel({'data': self.image_placeholder}, is_training=False, num_classes=self.NUM_CLASSES)
+        self.g = tf.Graph()
+        with self.g.as_default():
+            self.image_placeholder = tf.placeholder(tf.float32, shape=(None, None, None, 3))
+            self.net = DeepLabResNetModel({'data': self.image_placeholder}, is_training=False, num_classes=self.NUM_CLASSES)
 
-        restore_var = tf.global_variables()
+            restore_var = tf.global_variables()
 
-        # Set up TF session and initialize variables.
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
-        self.sess = tf.Session(config=config)
-        init = tf.global_variables_initializer()
+            # Set up TF session and initialize variables.
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            self.sess = tf.Session(config=config)
+            init = tf.global_variables_initializer()
 
-        self.sess.run(init)
+            self.sess.run(init)
 
-        # Load weights.
-        loader = tf.train.Saver(var_list=restore_var)
-        loader.restore(self.sess, './deeplab_resnet/deeplab_resnet.ckpt')
+            # Load weights.
+            loader = tf.train.Saver(var_list=restore_var)
+            loader.restore(self.sess, './deeplab_resnet/deeplab_resnet.ckpt')
 
     """ # Arguments
             img: a PIL image instance
@@ -162,18 +164,19 @@ class DeeplabWrapper(object):
         """
     def predict(self, img):
 
-        # RGB -> BGR
-        b, g, r = img.split()
-        img = Image.merge("RGB", (r, g, b))
-        img -= self.IMG_MEAN
+        with self.g.as_default():
+            # RGB -> BGR
+            b, g, r = img.split()
+            img = Image.merge("RGB", (r, g, b))
+            img -= self.IMG_MEAN
 
-        # Predictions.
-        raw_output = self.net.layers['fc1_voc12']
-        raw_output_up = tf.image.resize_bilinear(raw_output, tf.shape(img)[0:2, ])
-        raw_output_up = tf.argmax(raw_output_up, axis=3)
-        self.pred = tf.expand_dims(raw_output_up, dim=3)
+            # Predictions.
+            raw_output = self.net.layers['fc1_voc12']
+            raw_output_up = tf.image.resize_bilinear(raw_output, tf.shape(img)[0:2, ])
+            raw_output_up = tf.argmax(raw_output_up, axis=3)
+            self.pred = tf.expand_dims(raw_output_up, dim=3)
 
-        preds = self.sess.run(self.pred, feed_dict={self.image_placeholder: np.expand_dims(img, axis=0)})
+            preds = self.sess.run(self.pred, feed_dict={self.image_placeholder: np.expand_dims(img, axis=0)})
 
         msk = decode_labels(preds, num_classes=self.NUM_CLASSES)
         im = Image.fromarray(msk[0])
