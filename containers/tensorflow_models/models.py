@@ -8,17 +8,17 @@ sys.path.insert(0, deeplab_path)
 
 # For VGG16
 from keras.applications.vgg16 import VGG16
-from keras.applications.vgg16 import preprocess_input as preprocess_input_vgg,\
+from keras.applications.vgg16 import preprocess_input as preprocess_input_vgg, \
     decode_predictions as decode_predictions_vgg
 
 # For MobileNet
 from keras.applications.mobilenet import MobileNet
-from keras.applications.mobilenet import preprocess_input as preprocess_input_mobilenet,\
+from keras.applications.mobilenet import preprocess_input as preprocess_input_mobilenet, \
     decode_predictions as decode_predictions_mobilenet
 
 # For InceptionResNetV2
 from keras.applications.inception_v3 import InceptionV3
-from keras.applications.inception_v3 import preprocess_input as preprocess_input_inception,\
+from keras.applications.inception_v3 import preprocess_input as preprocess_input_inception, \
     decode_predictions as decode_predictions_inception
 
 # For sentiment analysis
@@ -39,19 +39,19 @@ import uuid
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
 
-
 class VGG16Wrapper(object):
     def __init__(self):
         logger.info('Loading vgg16')
         self.model = VGG16(weights='imagenet')
 
-    """ # Arguments
-            img: a PIL image instance
-
-        # Returns
-            A dict containing predictions
-        """
     def predict(self, img):
+        """ # Arguments
+                img: a numpy array
+
+            # Returns
+                A dict containing predictions
+            """
+        img = Image.fromarray(img)
         img = img.resize((224, 224))
         x = keras_image.img_to_array(img)[:, :, :3]
         x = np.expand_dims(x, axis=0)
@@ -69,13 +69,14 @@ class MobileNetWrapper(object):
         logger.info('Loading MobileNet')
         self.model = MobileNet(weights='imagenet')
 
-    """ # Arguments
-            img: a PIL image instance
-
-        # Returns
-            A dict containing predictions
-        """
     def predict(self, img):
+        """ # Arguments
+                img: a numpy array
+
+            # Returns
+                A dict containing predictions
+            """
+        img = Image.fromarray(img)
         img = img.resize((224, 224))
         x = keras_image.img_to_array(img)[:, :, :3]
         x = np.expand_dims(x, axis=0)
@@ -93,13 +94,14 @@ class InceptionV3Wrapper(object):
         logger.info('Loading Inception V3')
         self.model = InceptionV3(weights='imagenet')
 
-    """ # Arguments
-            img: a PIL image instance
-
-        # Returns
-            A dict containing predictions
-        """
     def predict(self, img):
+        """ # Arguments
+                img: a numpy array
+
+            # Returns
+                A dict containing predictions
+            """
+        img = Image.fromarray(img)
         img = img.resize((224, 224))
         x = keras_image.img_to_array(img)[:, :, :3]
         x = np.expand_dims(x, axis=0)
@@ -124,6 +126,12 @@ class ReviewSentimentWrapper(object):
             os.chdir(current_directory)
 
     def predict(self, text):
+        """ # Arguments
+                text: a string to process
+
+        # Returns
+            A dict containing predictions
+        """
         text_features = self.model.transform([text])
         # For more info https://github.com/openai/generating-reviews-discovering-sentiment/issues/2
         sentiment = text_features[0, 2388]
@@ -156,15 +164,16 @@ class DeeplabWrapper(object):
             loader = tf.train.Saver(var_list=restore_var)
             loader.restore(self.sess, './deeplab_resnet/deeplab_resnet.ckpt')
 
-    """ # Arguments
-            img: a PIL image instance
-
-        # Returns
-            The url to an image with the segmentation
-        """
     def predict(self, img):
+        """ # Arguments
+                img: a numpy array
+
+            # Returns
+                The url to an image with the segmentation
+            """
 
         with self.g.as_default():
+            img = Image.fromarray(img)
             # RGB -> BGR
             b, g, r = img.split()
             img = Image.merge("RGB", (r, g, b))
