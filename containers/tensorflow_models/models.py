@@ -1,6 +1,7 @@
 # In order to import models without touching their code
 # We add them to the path in order to import them as modules
 import os, sys
+
 reviews_path = os.path.abspath('./reviews')
 sys.path.insert(0, reviews_path)
 deeplab_path = os.path.abspath('./deeplab_resnet')
@@ -35,9 +36,11 @@ import numpy as np
 import json
 import logging
 import uuid
+import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
+
 
 class VGG16Wrapper(object):
     def __init__(self):
@@ -113,6 +116,7 @@ class InceptionV3Wrapper(object):
 
         return json.dumps(clean_predictions)
 
+
 class ReviewSentimentWrapper(object):
     def __init__(self):
         logger.info('Loading Review sentiment')
@@ -148,7 +152,8 @@ class DeeplabWrapper(object):
         self.g = tf.Graph()
         with self.g.as_default():
             self.image_placeholder = tf.placeholder(tf.float32, shape=(None, None, None, 3))
-            self.net = DeepLabResNetModel({'data': self.image_placeholder}, is_training=False, num_classes=self.NUM_CLASSES)
+            self.net = DeepLabResNetModel({'data': self.image_placeholder}, is_training=False,
+                                          num_classes=self.NUM_CLASSES)
 
             restore_var = tf.global_variables()
 
@@ -198,4 +203,3 @@ class DeeplabWrapper(object):
         im.save(save_path)
 
         return json.dumps({'output': filename})
-

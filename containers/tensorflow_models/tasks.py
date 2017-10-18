@@ -1,16 +1,34 @@
+import json
+
 import requests
 from celery import Task
 from celery.signals import worker_process_init
 
-from celery_queue import app
+from celery_queue import app, redis_instance
 from models import DeeplabWrapper, ReviewSentimentWrapper, MobileNetWrapper, VGG16Wrapper, InceptionV3Wrapper
+i = app.control.inspect()
+
+from celery.signals import after_task_publish, task_postrun
 
 
-class CallbackTask(Task):
-    def on_success(self, retval, task_id, args, kwargs):
-        data, session_id = retval
-        # TODO: url in params
-        requests.post('http://localhost:8091/notify_client', data={'sessionId': session_id, 'data': data})
+@after_task_publish.connect
+def task_sent_handler(sender=None, headers=None, body=None, **kwargs):
+    # information about task are located in headers for task messages
+    # using the task protocol version 2.
+    info = headers if 'task' in headers else body
+
+    task_id = info['id']
+    redis_instance.lpush('task_queue', task_id)
+
+
+@task_postrun.connect
+def task_run_handler(sender=None, task_id=None, task=None, args=None, retval=None,
+                      kwargs=None, **kwds):
+    redis_instance.lrem('task_queue', 1, task_id)
+
+    data, session_id = retval
+    # TODO: url in params
+    requests.post('http://localhost:8091/notify_client', data={'sessionId': session_id, 'data': data})
 
 
 vgg16_model = None
@@ -38,31 +56,31 @@ def init_models(**_):
     deeplab_model = DeeplabWrapper()
 
 
-@app.task(base=CallbackTask)
+@app.task
 def predict_vgg16(img, session_id):
     predictions = vgg16_model.predict(img)
     return predictions, session_id
 
 
-@app.task(base=CallbackTask)
+@app.task
 def predict_mobilenet(img, session_id):
     predictions = mobilenet_model.predict(img)
     return predictions, session_id
 
 
-@app.task(base=CallbackTask)
+@app.task
 def predict_inception(img, session_id):
     predictions = inception_model.predict(img)
     return predictions, session_id
 
 
-@app.task(base=CallbackTask)
+@app.task
 def predict_review_sentiment(text, session_id):
     predictions = review_sentiment_model.predict(text)
     return predictions, session_id
 
 
-@app.task(base=CallbackTask)
+@app.task
 def predict_deeplab(img, session_id):
     predictions = deeplab_model.predict(img)
     return predictions, session_id

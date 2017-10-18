@@ -39,6 +39,11 @@ app
             });
         });
 
+        socket.on('queue_status', function(data) {
+            console.log(JSON.parse(data.data));
+
+        });
+
         $scope.openModal = function (model) {
             $scope.currentModel = model;
             var modal = Popeye.openModal({

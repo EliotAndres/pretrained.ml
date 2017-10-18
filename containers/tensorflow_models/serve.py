@@ -3,19 +3,20 @@ import json
 
 import numpy as np
 from PIL import Image
-from celery.task.control import inspect
-from celery import Task
 from flask import Flask, request, abort, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
-from celery_queue import app
-from tasks import predict_vgg16, predict_mobilenet, predict_review_sentiment, predict_deeplab, predict_inception
+from celery_queue import app, redis_instance
+from tasks import predict_vgg16, predict_mobilenet, predict_review_sentiment,\
+    predict_deeplab, predict_inception
 
-i = inspect(app=app)
+i = app.control.inspect()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
+logging.getLogger('engineio').setLevel(logging.ERROR)
+logging.getLogger('socketio').setLevel(logging.ERROR)
 
 #TODO: use app.config
 CELERY_BROKER_URL = 'redis://localhost'
@@ -24,7 +25,7 @@ ERROR_NO_IMAGE = 'Please provide an image'
 ERROR_NO_TEXT = 'Please provide some text'
 
 flask_app = Flask(__name__)
-socketio = SocketIO(flask_app)
+socketio = SocketIO(flask_app, logger=False, engineio_logger=False)
 CORS(flask_app)
 
 def handle_image(request):
@@ -54,10 +55,10 @@ def handle_text(request):
 
 @flask_app.route('/notify_client', methods=['post'])
 def notify_client_route():
-    print(request.form)
     session_id = request.form.get('sessionId')
     data = request.form.get('data')
-    socketio.emit('finished_job', {'data': data}, room=session_id)
+    if session_id is not None:
+        socketio.emit('finished_job', {'data': data}, room=session_id)
 
     # TODO: proper response
     return "ok"
@@ -65,9 +66,11 @@ def notify_client_route():
 
 @flask_app.route('/status', methods=['get'])
 def status_route():
-    print(i.reserved())
-    print(i.active())
-    return "test"
+    task_ids = redis_instance.lrange('task_queue', 0, -1)
+    task_ids = [task.decode() for task in task_ids]
+    socketio.emit('queue_status', {'data': json.dumps(task_ids)}, broadcast=True)
+
+    return json.dumps(task_ids)
 
 
 @flask_app.route('/vgg16', methods=['POST'])
