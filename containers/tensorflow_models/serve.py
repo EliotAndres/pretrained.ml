@@ -53,45 +53,53 @@ def handle_text(request):
     return text, request.form.get('sessionId')
 
 
+def broadcast_queue_status():
+    # Broadcast queue status to all clients
+    task_ids = redis_instance.lrange('task_queue', 0, -1)
+    task_ids = [task.decode() for task in task_ids]
+    tasks_json = json.dumps(task_ids)
+    socketio.emit('queue_status', {'data': tasks_json}, broadcast=True)
+    return tasks_json
+
+
 @flask_app.route('/notify_client', methods=['post'])
 def notify_client_route():
-    session_id = request.form.get('sessionId')
-    data = request.form.get('data')
-    if session_id is not None:
-        socketio.emit('finished_job', {'data': data}, room=session_id)
+    session_id = request.form.get('session_id')
+    predictions = request.form.get('predictions')
+    task_id = request.form.get('task_id')
 
-    # TODO: proper response
-    return "ok"
+    if session_id is not None:
+        socketio.emit('finished_job', {'predictions': predictions, 'taskId': task_id}, room=session_id)
+
+    broadcast_queue_status()
+    return '200 OK'
 
 
 @flask_app.route('/status', methods=['get'])
 def status_route():
-    task_ids = redis_instance.lrange('task_queue', 0, -1)
-    task_ids = [task.decode() for task in task_ids]
-    socketio.emit('queue_status', {'data': json.dumps(task_ids)}, broadcast=True)
-
-    return json.dumps(task_ids)
+    tasks_json = broadcast_queue_status()
+    return tasks_json
 
 
 @flask_app.route('/vgg16', methods=['POST'])
 def vgg_route():
     img, session_id = handle_image(request)
     job = predict_vgg16.delay(img, session_id)
-    return json.dumps({'jobId': job.id})
+    return json.dumps({'taskId': job.id})
 
 
 @flask_app.route('/mobilenet', methods=['POST'])
 def mobilenet_route():
     img, session_id = handle_image(request)
     job = predict_mobilenet.delay(img, session_id)
-    return json.dumps({'jobId': job.id})
+    return json.dumps({'taskId': job.id})
 
 
 @flask_app.route('/inception', methods=['POST'])
 def inception_route():
     img, session_id = handle_image(request)
     job = predict_inception.delay(img, session_id)
-    return json.dumps({'jobId': job.id})
+    return json.dumps({'taskId': job.id})
 
 
 @flask_app.route('/review-sentiment', methods=['POST'])
@@ -99,14 +107,14 @@ def review_sentiment_route():
     text, session_id = handle_text(request)
     job = predict_review_sentiment.delay(text, session_id)
 
-    return json.dumps({'jobId': job.id})
+    return json.dumps({'taskId': job.id})
 
 
 @flask_app.route('/deeplab', methods=['POST'])
 def deeplab_route():
     img, session_id = handle_image(request)
     job = predict_deeplab.delay(img, session_id)
-    return json.dumps({'jobId': job.id})
+    return json.dumps({'taskId': job.id})
 
 
 @flask_app.route('/outputs/<path:path>')

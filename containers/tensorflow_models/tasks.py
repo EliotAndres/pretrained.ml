@@ -11,6 +11,8 @@ i = app.control.inspect()
 from celery.signals import after_task_publish, task_postrun
 
 
+BASE_URL = 'http://localhost:8091/'
+
 @after_task_publish.connect
 def task_sent_handler(sender=None, headers=None, body=None, **kwargs):
     # information about task are located in headers for task messages
@@ -18,8 +20,7 @@ def task_sent_handler(sender=None, headers=None, body=None, **kwargs):
     info = headers if 'task' in headers else body
 
     task_id = info['id']
-    redis_instance.lpush('task_queue', task_id)
-
+    redis_instance.rpush('task_queue', task_id)
 
 @task_postrun.connect
 def task_run_handler(sender=None, task_id=None, task=None, args=None, retval=None,
@@ -28,7 +29,8 @@ def task_run_handler(sender=None, task_id=None, task=None, args=None, retval=Non
 
     data, session_id = retval
     # TODO: url in params
-    requests.post('http://localhost:8091/notify_client', data={'sessionId': session_id, 'data': data})
+    requests.post(BASE_URL + 'notify_client',
+                  data={'session_id': session_id, 'predictions': data, 'task_id': task_id})
 
 
 vgg16_model = None

@@ -8,3 +8,5 @@ Flask-Cors>=3.0.3
 tqdm>=4.17.1
 scikit-learn>=0.19.0
 pandas>=0.20.3
+celery==4.1.0
+redis==2.10.6

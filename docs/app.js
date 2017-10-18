@@ -25,23 +25,25 @@ app
         });
 
         socket.on('connect', function() {
-            console.log('sessionID ' + socket.id);
+            console.log('Connected, sessionID is ' + socket.id);
             $scope.sessionId = socket.id;
         });
 
         socket.on('finished_job', function(data) {
-            console.log(JSON.parse(data.data));
             $scope.loading = false;
-
-            $timeout(function () {
-                $scope.predictions = JSON.parse(data.data);
-                console.log($scope.predictions[0])
-            });
+            // If the user closed the modal and opened a new one before task returned
+            if (data.taskId === $scope.currentTaskId) {
+                $timeout(function () {
+                    $scope.predictions = JSON.parse(data.predictions);
+                });
+            }
         });
 
         socket.on('queue_status', function(data) {
-            console.log(JSON.parse(data.data));
-
+            var taskIds = JSON.parse(data.data);
+            $timeout(function () {
+                $scope.queuePosition = taskIds.indexOf($scope.currentTaskId)
+            });
         });
 
         $scope.openModal = function (model) {
@@ -58,10 +60,13 @@ app
         };
 
         $scope.reset = function () {
+            // TODO: move these variables to a modalStatus object
             $scope.image = undefined;
             $scope.text = undefined;
             $scope.predictions = undefined;
             $scope.uploadProgress = undefined;
+            $scope.currentTaskId = undefined;
+            $scope.queuePosition = undefined;
         };
 
         $scope.uploadImage = function (files, file) {
@@ -70,7 +75,8 @@ app
                 data: {file: file, 'sessionId': $scope.sessionId}
             }).progress(function(event) {
                 $scope.uploadProgress = parseInt(100.0 * event.loaded / event.total);
-            }).then(function(data, status, headers, config) {
+            }).then(function(response) {
+                $scope.currentTaskId = response.data.taskId
                 // TODO notify that request has been added to queue
             });
         };
@@ -82,10 +88,12 @@ app
             $http({
                 method: 'POST',
                 url: 'http://s2.ndres.me:8091/' + $scope.currentModel.demoUrl,
-                data: 'text=' + text,
+                data: 'text=' + text + '&sessionId=' + $scope.sessionId,
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             }).then(function (response) {
                 // TODO notify that request has been added to queue
+                $scope.currentTaskId = response.data.taskId
+
             }).catch(function (error) {
                 $scope.loading = false;
                 console.log(error)

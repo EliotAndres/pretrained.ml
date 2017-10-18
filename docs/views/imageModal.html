@@ -32,7 +32,10 @@
 
             <div ng-if="uploadProgress && uploadProgress >= 99 && !predictions">
                 <p>
-                    Computing predictions ...
+                    Computing predictions... <span ng-if="queuePosition >= 0">Number of jobs before yours: <b>{{queuePosition}}</b></span>
+                </p>
+                <p>
+
                 </p>
             </div>
 
