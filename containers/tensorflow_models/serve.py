@@ -19,8 +19,6 @@ logging.getLogger('engineio').setLevel(logging.ERROR)
 logging.getLogger('socketio').setLevel(logging.ERROR)
 
 #TODO: use app.config
-CELERY_BROKER_URL = 'redis://localhost'
-CELERY_RESULT_BACKEND = 'redis://localhost'
 ERROR_NO_IMAGE = 'Please provide an image'
 ERROR_NO_TEXT = 'Please provide some text'
 

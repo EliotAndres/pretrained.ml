@@ -11,7 +11,7 @@ i = app.control.inspect()
 from celery.signals import after_task_publish, task_postrun
 
 
-BASE_URL = 'http://localhost:8091/'
+BASE_URL = 'http://web:8091/'
 
 @after_task_publish.connect
 def task_sent_handler(sender=None, headers=None, body=None, **kwargs):

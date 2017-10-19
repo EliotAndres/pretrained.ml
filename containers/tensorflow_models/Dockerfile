@@ -46,8 +46,8 @@ WORKDIR /opt/srv
 
 RUN pip3 install -r requirements.txt
 
-COPY ./ /opt/srv
-
 ADD http://eliot.andres.free.fr/models/deeplab_resnet.ckpt /opt/srv/containers/tensorflow/
 
-WORKDIR /opt/srv/
+RUN adduser --disabled-password --gecos '' celery-user
+
+WORKDIR /opt/srv/tensorflow_models

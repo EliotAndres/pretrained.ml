@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+  redis:
+    image: redis:4.0.2
+    hostname: redis
+
+  web:
+    build:
+      context: ./tensorflow_models
+      dockerfile: Dockerfile
+    hostname: web
+    command: ./serve.sh
+    volumes:
+      - .:/opt/srv
+    ports:
+      - "8091:8091"
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  worker:
+    build:
+      context: ./tensorflow_models
+      dockerfile: Dockerfile
+    command: ./celery.sh
+    volumes:
+      - .:/opt/srv
+    links:
+      - redis
+    depends_on:
+    - redis
