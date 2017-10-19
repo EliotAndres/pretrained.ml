@@ -8,11 +8,12 @@ Having spent too much time installing deep learning models just to evaluate thei
  - Gather all the deep learning models available
 
 ## Installation
+    Requirements: Docker and docker-compose
 
     git clone https://github.com/EliotAndres/pretrained.ml
-    cd containers/tensorflow
-    sudo docker build . -t keras
-    docker run -dit -p 0.0.0.0:8081:8091 -t keras
+    cd containers
+    docker-compose build
+    docker-compose up -d
 
 ## Useful commands
     docker ps #list images
