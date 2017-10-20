@@ -12,6 +12,9 @@ Having spent too much time installing deep learning models just to evaluate thei
 
     git clone https://github.com/EliotAndres/pretrained.ml
     cd containers
+    # Model source: https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU
+    # Please do not overuse this url
+    wget http://eliot.andres.free.fr/models/deeplab_resnet.ckpt -O tensorflow_models/deeplab_resnet/deeplab_resnet.ckpt
     docker-compose build
     docker-compose up -d
 

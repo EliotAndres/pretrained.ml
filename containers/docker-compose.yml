@@ -27,6 +27,8 @@ services:
     command: ./celery.sh
     volumes:
       - .:/opt/srv
+      # To avoid downloading models on each docker build
+      - ~/.keras/models/:/tmp/.keras/models/
     links:
       - redis
     depends_on:
