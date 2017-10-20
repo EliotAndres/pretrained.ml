@@ -45,9 +45,9 @@ models:
     demoUrl: 'deeplab'
 
   -
-    name: Faster-RCNN
+    name: Faster RCNN Incepition Resnet v2 w/ atrous convolution
     description:  A convnet for object detection with a region proposal network
     type: Computer Vision
     subtype: Object Detection
-    size: TODO
-    reference: https://github.com/smallcorgi/Faster-RCNN_TF
+    size: 638
+    reference: https://github.com/tensorflow/models/tree/master/research/object_detection

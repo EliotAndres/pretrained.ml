@@ -4,6 +4,6 @@
 [submodule "containers/tensorflow/deeplab_resnet"]
 	path = containers/tensorflow_models/deeplab_resnet
 	url = https://github.com/EliotAndres/tensorflow-deeplab-resnet
-[submodule "containers/tensorflow_models/faster_rcnn"]
-	path = containers/tensorflow_models/faster_rcnn
-	url = https://github.com/smallcorgi/Faster-RCNN_TF
+[submodule "containers/tensorflow_models/tensorflow_models_repo"]
+	path = containers/tensorflow_models/tensorflow_models_repo
+	url = https://github.com/tensorflow/models
