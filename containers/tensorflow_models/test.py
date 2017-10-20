@@ -1,7 +1,15 @@
-import socketio
+from models import DetectionApiWrapper
+import cv2
+from PIL import Image
 
-sio = socketio.Server()
 
-@sio.on('connect')
-def connect(sid, environ):
-    print('connect ', sid)
+detect = DetectionApiWrapper()
+
+im = cv2.imread('elephant.png')
+
+
+resp = detect.predict(im)
+
+print(resp)
+
+#from .reviews.encoder import Model as SentimentModel

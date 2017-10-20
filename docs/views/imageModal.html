@@ -54,7 +54,7 @@
             <!--If the model returns an image-->
             <div ng-if="predictions.output" class="segmentation">
                 <img ng-src="{{serverUrl + predictions.output}}" class="segmentation-image" alt="">
-                <img src="image/colour_scheme.png" class="segmentation-legend" alt="">
+                <img ng-if="currentModel.subType == 'Object Detection'" src="image/colour_scheme.png" class="segmentation-legend" alt="">
             </div>
 
         </div>

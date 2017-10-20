@@ -11,7 +11,8 @@ app
 
         var modals = {'Object Recognition': 'imageModal.html',
             'Semantic Segmentation': 'imageModal.html',
-            'Sentiment Analysis': 'nlpModal.html'};
+            'Sentiment Analysis': 'nlpModal.html',
+            'Object Detection': 'imageModal.html'};
 
         $http({
             method: 'GET',

@@ -12,7 +12,10 @@ Having spent too much time installing deep learning models just to evaluate thei
 
     git clone https://github.com/EliotAndres/pretrained.ml
     cd containers
-    # Model source: https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU
+
+    #TODO make install script
+    # Build tf-models protobuf
+    # Original model source: https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU
     # Please do not overuse this url
     wget http://eliot.andres.free.fr/models/deeplab_resnet.ckpt -O tensorflow_models/deeplab_resnet/deeplab_resnet.ckpt
     docker-compose build
@@ -42,6 +45,5 @@ Other way: add a model with a demo:
 - [ ] Use nvidia-docker ?
 - [ ] Add flag to compile Tensorflow
 - [ ] Consider splitting each model in a different container ?
-- [ ] Add queuing system
 - [ ] Linter
-- [ ] Resize images for segmentation
+- [ ] Add analytics

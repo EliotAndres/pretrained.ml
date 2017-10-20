@@ -1,11 +1,16 @@
+import os, sys
 # In order to import models without touching their code
 # We add them to the path in order to import them as modules
-import os, sys
 
 reviews_path = os.path.abspath('./reviews')
-sys.path.insert(0, reviews_path)
-deeplab_path = os.path.abspath('./deeplab_resnet')
-sys.path.insert(0, deeplab_path)
+TF_MODELS_BASE_PATH = './tensorflow_models_repo'
+paths = [reviews_path,
+         os.path.abspath('./deeplab_resnet'),
+         os.path.abspath(os.path.join(TF_MODELS_BASE_PATH, 'research')),
+         os.path.abspath(os.path.join(TF_MODELS_BASE_PATH, 'research/slim')),
+         ]
+for path in paths:
+    sys.path.insert(0, path)
 
 # For VGG16
 from keras.applications.vgg16 import VGG16
@@ -30,6 +35,10 @@ from deeplab_resnet import DeepLabResNetModel, ImageReader, decode_labels, prepa
 from PIL import Image
 import tensorflow as tf
 
+# For Tensorflow model analysis
+from object_detection.utils import label_map_util
+from object_detection.utils import visualization_utils as vis_util
+
 from keras.preprocessing import image as keras_image
 import numpy as np
 
@@ -40,7 +49,6 @@ import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
-
 
 class VGG16Wrapper(object):
     def __init__(self):
@@ -120,8 +128,8 @@ class InceptionV3Wrapper(object):
 class ReviewSentimentWrapper(object):
     def __init__(self):
         logger.info('Loading Review sentiment')
-        self.g = tf.Graph()
-        with self.g.as_default():
+        self.graph = tf.Graph()
+        with self.graph.as_default():
             current_directory = os.getcwd()
 
             # Necessary as the model is imported with relative path
@@ -149,8 +157,8 @@ class DeeplabWrapper(object):
 
     def __init__(self):
         logger.info('Loading Deeplab')
-        self.g = tf.Graph()
-        with self.g.as_default():
+        self.graph = tf.Graph()
+        with self.graph.as_default():
             self.image_placeholder = tf.placeholder(tf.float32, shape=(None, None, None, 3))
             self.net = DeepLabResNetModel({'data': self.image_placeholder}, is_training=False,
                                           num_classes=self.NUM_CLASSES)
@@ -177,7 +185,7 @@ class DeeplabWrapper(object):
                 The url to an image with the segmentation
             """
 
-        with self.g.as_default():
+        with self.graph.as_default():
             img = Image.fromarray(img)
             # RGB -> BGR
             b, g, r = img.split()
@@ -195,7 +203,7 @@ class DeeplabWrapper(object):
         msk = decode_labels(preds, num_classes=self.NUM_CLASSES)
         im = Image.fromarray(msk[0])
 
-        filename = str(uuid.uuid4()) + '.png'
+        filename = str(uuid.uuid4()) + '.jpg'
         save_dir = './outputs'
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
@@ -203,3 +211,81 @@ class DeeplabWrapper(object):
         im.save(save_path)
 
         return json.dumps({'output': filename})
+
+
+class DetectionApiWrapper(object):
+    PATH_TO_CKPT = 'ssd_mobilenet_v1_coco_11_06_2017/frozen_inference_graph.pb'
+    PATH_TO_LABELS = os.path.join(os.path.join(TF_MODELS_BASE_PATH,
+                                               'research/object_detection/data'),
+                                  'mscoco_label_map.pbtxt')
+    NUM_CLASSES = 90
+
+    def __init__(self):
+        logger.info('Loading Tensorflow Detection API')
+        self.graph = tf.Graph()
+
+        with self.graph.as_default():
+            od_graph_def = tf.GraphDef()
+            with tf.gfile.GFile(self.PATH_TO_CKPT, 'rb') as fid:
+                serialized_graph = fid.read()
+                od_graph_def.ParseFromString(serialized_graph)
+                tf.import_graph_def(od_graph_def, name='')
+
+        self.label_map = label_map_util.load_labelmap(self.PATH_TO_LABELS)
+        self.categories = label_map_util.convert_label_map_to_categories(self.label_map,
+                                                                         max_num_classes=self.NUM_CLASSES,
+                                                                         use_display_name=True)
+        self.category_index = label_map_util.create_category_index(self.categories)
+
+    def predict(self, img):
+        """ # Arguments
+                img: a numpy array
+
+            # Returns
+                The url to an image with the bounding boxes
+            """
+
+        def load_image_into_numpy_array(image):
+            (im_width, im_height) = image.size
+            return np.array(image.getdata()).reshape(
+                (im_height, im_width, 3)).astype(np.uint8)
+
+        with self.graph.as_default():
+            with tf.Session(graph=self.graph) as sess:
+                # Definite input and output Tensors for detection_graph
+                image_tensor = self.graph.get_tensor_by_name('image_tensor:0')
+                # Each box represents a part of the image where a particular object was detected.
+                detection_boxes = self.graph.get_tensor_by_name('detection_boxes:0')
+                # Each score represent how level of confidence for each of the objects.
+                # Score is shown on the result image, together with the class label.
+                detection_scores = self.graph.get_tensor_by_name('detection_scores:0')
+                detection_classes = self.graph.get_tensor_by_name('detection_classes:0')
+                num_detections = self.graph.get_tensor_by_name('num_detections:0')
+                image = Image.fromarray(img)
+                # the array based representation of the image will be used later in order to prepare the
+                # result image with boxes and labels on it.
+                image_np = load_image_into_numpy_array(image)
+                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+                image_np_expanded = np.expand_dims(image_np, axis=0)
+                # Actual detection.
+                (boxes, scores, classes, num) = sess.run(
+                    [detection_boxes, detection_scores, detection_classes, num_detections],
+                    feed_dict={image_tensor: image_np_expanded})
+                # Visualization of the results of a detection.
+                vis_util.visualize_boxes_and_labels_on_image_array(
+                    image_np,
+                    np.squeeze(boxes),
+                    np.squeeze(classes).astype(np.int32),
+                    np.squeeze(scores),
+                    self.category_index,
+                    use_normalized_coordinates=True,
+                    line_thickness=8)
+                im = Image.fromarray(image_np)
+                filename = str(uuid.uuid4()) + '.jpg'
+                save_dir = './outputs'
+                if not os.path.exists(save_dir):
+                    os.makedirs(save_dir)
+                save_path = os.path.join(save_dir, filename)
+                im.save(save_path)
+
+                return json.dumps({'output': filename})

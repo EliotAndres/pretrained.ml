@@ -5,7 +5,8 @@ from celery import Task
 from celery.signals import worker_process_init
 
 from celery_queue import app, redis_instance
-from models import DeeplabWrapper, ReviewSentimentWrapper, MobileNetWrapper, VGG16Wrapper, InceptionV3Wrapper
+from models import DeeplabWrapper, ReviewSentimentWrapper, MobileNetWrapper, VGG16Wrapper, InceptionV3Wrapper,\
+    DetectionApiWrapper
 i = app.control.inspect()
 
 from celery.signals import after_task_publish, task_postrun
@@ -38,6 +39,7 @@ mobilenet_model = None
 review_sentiment_model = None
 deeplab_model = None
 inception_model = None
+faster_rcnn_model = None
 
 
 @worker_process_init.connect()
@@ -56,6 +58,9 @@ def init_models(**_):
 
     global deeplab_model
     deeplab_model = DeeplabWrapper()
+
+    global faster_rcnn_model
+    faster_rcnn_model = DetectionApiWrapper()
 
 
 @app.task
@@ -85,4 +90,10 @@ def predict_review_sentiment(text, session_id):
 @app.task
 def predict_deeplab(img, session_id):
     predictions = deeplab_model.predict(img)
+    return predictions, session_id
+
+
+@app.task
+def predict_faster_rcnn(img, session_id):
+    predictions = faster_rcnn_model.predict(img)
     return predictions, session_id

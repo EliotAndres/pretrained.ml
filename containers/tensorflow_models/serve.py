@@ -9,7 +9,7 @@ from flask_socketio import SocketIO
 
 from celery_queue import app, redis_instance
 from tasks import predict_vgg16, predict_mobilenet, predict_review_sentiment,\
-    predict_deeplab, predict_inception
+    predict_deeplab, predict_inception, predict_faster_rcnn
 
 i = app.control.inspect()
 
@@ -21,6 +21,7 @@ logging.getLogger('socketio').setLevel(logging.ERROR)
 #TODO: use app.config
 ERROR_NO_IMAGE = 'Please provide an image'
 ERROR_NO_TEXT = 'Please provide some text'
+MAX_SIZE = (512, 512)
 
 flask_app = Flask(__name__)
 socketio = SocketIO(flask_app, logger=False, engineio_logger=False)
@@ -37,6 +38,7 @@ def handle_image(request):
         abort(400, ERROR_NO_IMAGE)
 
     img = Image.open(file)
+    img.thumbnail(MAX_SIZE, Image.ANTIALIAS)
     return np.array(img), request.form.get('sessionId')
 
 
@@ -112,6 +114,13 @@ def review_sentiment_route():
 def deeplab_route():
     img, session_id = handle_image(request)
     job = predict_deeplab.delay(img, session_id)
+    return json.dumps({'taskId': job.id})
+
+
+@flask_app.route('/faster-rcnn', methods=['POST'])
+def faster_rcnn_route():
+    img, session_id = handle_image(request)
+    job = predict_faster_rcnn.delay(img, session_id)
     return json.dumps({'taskId': job.id})
 
 
