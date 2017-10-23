@@ -2,11 +2,12 @@ from __future__ import absolute_import, unicode_literals
 from celery import Celery
 import redis
 
-CELERY_BROKER_URL = 'redis://redis/0'
-CELERY_RESULT_BACKEND = 'redis://redis/0'
+import config
 
-app = Celery('proj', broker=CELERY_BROKER_URL,
-             backend=CELERY_RESULT_BACKEND,
+CELERY_BROKER_URL = 'redis://redis/0'
+
+app = Celery('proj', broker=config.REDIS_URL,
+             backend=config.REDIS_URL,
              include=['tasks'])
 
 app.conf.task_serializer = 'pickle'

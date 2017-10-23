@@ -1,4 +1,4 @@
-import json
+import logging
 
 import requests
 from celery import Task
@@ -11,6 +11,8 @@ i = app.control.inspect()
 
 from celery.signals import after_task_publish, task_postrun
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__package__)
 
 BASE_URL = 'http://web:8091/'
 
@@ -39,7 +41,7 @@ mobilenet_model = None
 review_sentiment_model = None
 deeplab_model = None
 inception_model = None
-faster_rcnn_model = None
+ssd_inception_model = None
 
 
 @worker_process_init.connect()
@@ -59,9 +61,10 @@ def init_models(**_):
     global deeplab_model
     deeplab_model = DeeplabWrapper()
 
-    global faster_rcnn_model
-    faster_rcnn_model = DetectionApiWrapper()
+    global ssd_inception_model
+    ssd_inception_model = DetectionApiWrapper()
 
+    logger.info('Done loading models')
 
 @app.task
 def predict_vgg16(img, session_id):
@@ -94,6 +97,6 @@ def predict_deeplab(img, session_id):
 
 
 @app.task
-def predict_faster_rcnn(img, session_id):
-    predictions = faster_rcnn_model.predict(img)
+def predict_ssd_inception(img, session_id):
+    predictions = ssd_inception_model.predict(img)
     return predictions, session_id

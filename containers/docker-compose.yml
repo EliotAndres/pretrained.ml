@@ -24,7 +24,7 @@ services:
     build:
       context: ./tensorflow_models
       dockerfile: Dockerfile
-    command: ./celery.sh
+    command: ./worker.sh
     volumes:
       - .:/opt/srv
       # To avoid downloading models on each docker build

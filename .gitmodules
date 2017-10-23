@@ -1,5 +1,5 @@
 [submodule "containers/tensorflow/reviews"]
-	path = containers/tensorflow_models/reviews
+	path = containers/tensorflow_models/reviews_sentiment
 	url = https://github.com/openai/generating-reviews-discovering-sentiment
 [submodule "containers/tensorflow/deeplab_resnet"]
 	path = containers/tensorflow_models/deeplab_resnet

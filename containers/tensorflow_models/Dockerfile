@@ -23,6 +23,8 @@ RUN apt-get update -qq \
     python3-scipy \
     python3-h5py \
     python3-yaml \
+    protobuf-compiler \
+    python-lxml \
     python3-pydot \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*

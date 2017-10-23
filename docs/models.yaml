@@ -45,10 +45,10 @@ models:
     demoUrl: 'deeplab'
 
   -
-    name: Faster RCNN Incepition Resnet v2 w/ atrous convolution
-    description:  A convnet for object detection with a region proposal network
+    name: SSD Inception v2
+    description:  A convnet for object detection with single shot multibox detector
     type: Computer Vision
     subtype: Object Detection
-    size: 638
+    size: 445
     reference: https://github.com/tensorflow/models/tree/master/research/object_detection
-    demoUrl: 'faster-rcnn'
+    demoUrl: 'ssd-inception'

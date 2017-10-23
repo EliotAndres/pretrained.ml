@@ -8,8 +8,9 @@ from flask_cors import CORS
 from flask_socketio import SocketIO
 
 from celery_queue import app, redis_instance
-from tasks import predict_vgg16, predict_mobilenet, predict_review_sentiment,\
-    predict_deeplab, predict_inception, predict_faster_rcnn
+import config
+from tasks import predict_vgg16, predict_mobilenet, predict_review_sentiment, \
+    predict_deeplab, predict_inception, predict_ssd_inception
 
 i = app.control.inspect()
 
@@ -18,37 +19,33 @@ logger = logging.getLogger(__package__)
 logging.getLogger('engineio').setLevel(logging.ERROR)
 logging.getLogger('socketio').setLevel(logging.ERROR)
 
-#TODO: use app.config
-ERROR_NO_IMAGE = 'Please provide an image'
-ERROR_NO_TEXT = 'Please provide some text'
-MAX_SIZE = (512, 512)
-
 flask_app = Flask(__name__)
-socketio = SocketIO(flask_app, logger=False, engineio_logger=False)
+
+socketio = SocketIO(flask_app)
 CORS(flask_app)
 
 def handle_image(request):
     if 'file' not in request.files:
-        abort(400, ERROR_NO_IMAGE)
+        abort(400, config.ERROR_NO_IMAGE)
 
     file = request.files['file']
     # if user does not select file, browser also
     # submit a empty part without filename
     if file.filename == '':
-        abort(400, ERROR_NO_IMAGE)
+        abort(400, config.ERROR_NO_IMAGE)
 
     img = Image.open(file)
-    img.thumbnail(MAX_SIZE, Image.ANTIALIAS)
+    img.thumbnail(config.MAX_SIZE, Image.ANTIALIAS)
     return np.array(img), request.form.get('sessionId')
 
 
 def handle_text(request):
     if 'text' not in request.form:
-        abort(400, ERROR_NO_TEXT)
+        abort(400, config.ERROR_NO_TEXT)
 
     text = request.form['text']
     if len(text) < 1:
-        abort(400, ERROR_NO_TEXT)
+        abort(400, config.ERROR_NO_TEXT)
 
     return text, request.form.get('sessionId')
 
@@ -117,10 +114,10 @@ def deeplab_route():
     return json.dumps({'taskId': job.id})
 
 
-@flask_app.route('/faster-rcnn', methods=['POST'])
+@flask_app.route('/ssd-inception', methods=['POST'])
 def faster_rcnn_route():
     img, session_id = handle_image(request)
-    job = predict_faster_rcnn.delay(img, session_id)
+    job = predict_ssd_inception.delay(img, session_id)
     return json.dumps({'taskId': job.id})
 
 
@@ -128,4 +125,6 @@ def faster_rcnn_route():
 def serve_images(path):
     return send_from_directory('outputs', path)
 
+logger.info('Web server starting')
 socketio.run(flask_app, debug=False, host='0.0.0.0', port=8091)
+

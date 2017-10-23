@@ -1,14 +1,17 @@
-import os, sys
+import os
+import sys
+
 # In order to import models without touching their code
 # We add them to the path in order to import them as modules
 
-reviews_path = os.path.abspath('./reviews')
+reviews_path = os.path.abspath('./reviews_sentiment')
+deeplab_path = os.path.abspath('./deeplab_resnet')
+
 TF_MODELS_BASE_PATH = './tensorflow_models_repo'
 paths = [reviews_path,
-         os.path.abspath('./deeplab_resnet'),
+         deeplab_path,
          os.path.abspath(os.path.join(TF_MODELS_BASE_PATH, 'research')),
-         os.path.abspath(os.path.join(TF_MODELS_BASE_PATH, 'research/slim')),
-         ]
+         os.path.abspath(os.path.join(TF_MODELS_BASE_PATH, 'research/slim'))]
 for path in paths:
     sys.path.insert(0, path)
 
@@ -31,7 +34,7 @@ from keras.applications.inception_v3 import preprocess_input as preprocess_input
 from encoder import Model as SentimentModel
 
 # For deeplab
-from deeplab_resnet import DeepLabResNetModel, ImageReader, decode_labels, prepare_label
+from deeplab_resnet import DeepLabResNetModel, decode_labels
 from PIL import Image
 import tensorflow as tf
 
@@ -41,14 +44,18 @@ from object_detection.utils import visualization_utils as vis_util
 
 from keras.preprocessing import image as keras_image
 import numpy as np
+from keras.utils import get_file
 
 import json
 import logging
 import uuid
-import time
+import tarfile
+
+import config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__package__)
+
 
 class VGG16Wrapper(object):
     def __init__(self):
@@ -157,6 +164,10 @@ class DeeplabWrapper(object):
 
     def __init__(self):
         logger.info('Loading Deeplab')
+
+        local_path = os.path.join(config.WEIGHT_PATH, config.DEEPLAB_FILENAME)
+        self.weights_path = get_file(os.path.abspath(local_path), config.DEEPLAB_URL, cache_subdir='models')
+
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.image_placeholder = tf.placeholder(tf.float32, shape=(None, None, None, 3))
@@ -166,16 +177,16 @@ class DeeplabWrapper(object):
             restore_var = tf.global_variables()
 
             # Set up TF session and initialize variables.
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            self.sess = tf.Session(config=config)
+            config_tf = tf.ConfigProto()
+            config_tf.gpu_options.allow_growth = True
+            self.sess = tf.Session(config=config_tf)
             init = tf.global_variables_initializer()
 
             self.sess.run(init)
 
             # Load weights.
             loader = tf.train.Saver(var_list=restore_var)
-            loader.restore(self.sess, './deeplab_resnet/deeplab_resnet.ckpt')
+            loader.restore(self.sess, self.weights_path)
 
     def predict(self, img):
         """ # Arguments
@@ -214,7 +225,7 @@ class DeeplabWrapper(object):
 
 
 class DetectionApiWrapper(object):
-    PATH_TO_CKPT = 'ssd_mobilenet_v1_coco_11_06_2017/frozen_inference_graph.pb'
+    PB_NAME = 'frozen_inference_graph.pb'
     PATH_TO_LABELS = os.path.join(os.path.join(TF_MODELS_BASE_PATH,
                                                'research/object_detection/data'),
                                   'mscoco_label_map.pbtxt')
@@ -222,11 +233,22 @@ class DetectionApiWrapper(object):
 
     def __init__(self):
         logger.info('Loading Tensorflow Detection API')
-        self.graph = tf.Graph()
 
+        weights_path = get_file(config.SSD_INCEPTION_FILENAME, config.SSD_INCEPTION_URL,
+                                cache_dir=os.path.abspath(config.WEIGHT_PATH),
+                                cache_subdir='models')
+
+        extract_path = weights_path.replace('.tar.gz', '')
+        if not os.path.exists(extract_path):
+            tar = tarfile.open(weights_path, "r:gz")
+            tar.extractall(path=os.path.join(config.WEIGHT_PATH, 'models'))
+            tar.close()
+        pb_path = os.path.join(extract_path, self.PB_NAME)
+
+        self.graph = tf.Graph()
         with self.graph.as_default():
             od_graph_def = tf.GraphDef()
-            with tf.gfile.GFile(self.PATH_TO_CKPT, 'rb') as fid:
+            with tf.gfile.GFile(pb_path, 'rb') as fid:
                 serialized_graph = fid.read()
                 od_graph_def.ParseFromString(serialized_graph)
                 tf.import_graph_def(od_graph_def, name='')

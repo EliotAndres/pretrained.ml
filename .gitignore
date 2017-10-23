@@ -1,4 +1,6 @@
-containers/tensorflow/outputs
+containers/tensorflow_models/outputs
+containers/tensorflow_models/weights/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
