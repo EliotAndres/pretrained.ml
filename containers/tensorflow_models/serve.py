@@ -36,7 +36,7 @@ def handle_image(request):
 
     img = Image.open(file)
     img.thumbnail(config.MAX_SIZE, Image.ANTIALIAS)
-    return np.array(img), request.form.get('sessionId')
+    return np.array(img)[:, :, :3], request.form.get('sessionId')
 
 
 def handle_text(request):

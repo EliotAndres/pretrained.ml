@@ -14,6 +14,13 @@ app
             'Sentiment Analysis': 'nlpModal.html',
             'Object Detection': 'imageModal.html'};
 
+        var trackMixpanel = function (name, data) {
+            if (location.hostname !== "localhost") {
+                mixpanel.track(name, data);
+            }
+        };
+        trackMixpanel("Page Opened");
+
         $http({
             method: 'GET',
             url: 'models.yaml'
@@ -46,12 +53,6 @@ app
                 $scope.queuePosition = taskIds.indexOf($scope.currentTaskId)
             });
         });
-
-        var trackMixpanel = function (name, data) {
-            if (location.hostname !== "localhost") {
-                mixpanel.track(name, data);
-            }
-        };
 
         $scope.openModal = function (model) {
             trackMixpanel("Opened Modal", {"model": model.name});
