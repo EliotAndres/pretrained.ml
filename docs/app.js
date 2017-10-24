@@ -47,7 +47,15 @@ app
             });
         });
 
+        var trackMixpanel = function (name, data) {
+            if (location.hostname !== "localhost") {
+                mixpanel.track(name, data);
+            }
+        };
+
         $scope.openModal = function (model) {
+            trackMixpanel("Opened Modal", {"model": model.name});
+
             $scope.currentModel = model;
             var modal = Popeye.openModal({
                 templateUrl: 'views/' + modals[model.subtype],

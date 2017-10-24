@@ -2,6 +2,7 @@
 Sortable and searchable compilation of pre-trained deep learning models. With demos and code.
 
 ## A word of warning
+This is running on a server without GPU, hence it seems slow.
 
 Also, the code may look a bit like monkey-patching for the following reasons:
  - Models are cloned as submodules: therefore we have to mess around with the python path :-(
@@ -16,7 +17,7 @@ Having spent too much time installing deep learning models just to evaluate thei
 ## Installation
 Requirements: Docker, docker-compose and enough space free for the model weights.
 
-    git clone https://github.com/EliotAndres/pretrained.ml
+    git clone https://github.com/EliotAndres/pretrained.ml --recursive
     cd containers
     docker-compose build
     docker-compose up -d

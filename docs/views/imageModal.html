@@ -55,7 +55,6 @@
             <div ng-if="predictions.output" class="segmentation">
                 <img ng-src="{{serverUrl + predictions.output}}" class="segmentation-image" alt="">
                 <img ng-if="currentModel.subtype == 'Semantic Segmentation'" src="image/colour_scheme.png" class="segmentation-legend" alt="">
-                {{currentModel.subtype}}
             </div>
 
         </div>
