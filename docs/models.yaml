@@ -34,7 +34,14 @@ models:
     size: 330
     reference: https://blog.openai.com/unsupervised-sentiment-neuron/
     demoUrl: 'review-sentiment'
-
+    
+    name: DeepMoji
+    description: Encodes short texts into 2304 features representing the emotional content. Yields state-of-the-art performance for detecting emotions, sarcasm, insults etc. Trained by predicting 64 types of emojis across 1.2 billion tweets.
+    type: Natural Language Processing
+    subtype: Emotion Representations for Transfer Learning
+    size: 86
+    reference: https://github.com/bfelbo/DeepMoji
+    demoUrl: https://deepmoji.mit.edu
   -
     name: DeepLab-ResNet
     description: Semantic segmentation by atrous convolution, multi-scale inputs with max-pooling to merge the results from all scales, and atrous spatial pyramid pooling. The model has been pretrained on MS-COCO dataset.
