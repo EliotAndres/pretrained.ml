@@ -34,7 +34,8 @@ models:
     size: 330
     reference: https://blog.openai.com/unsupervised-sentiment-neuron/
     demoUrl: 'review-sentiment'
-    
+
+  -
     name: DeepMoji
     description: Encodes short texts into 2304 features representing the emotional content. Yields state-of-the-art performance for detecting emotions, sarcasm, insults etc. Trained by predicting 64 types of emojis across 1.2 billion tweets.
     type: Natural Language Processing

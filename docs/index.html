@@ -77,7 +77,8 @@ mixpanel.init("1d56782363052e80379c4bc5074f1642");</script><!-- end Mixpanel -->
                 </td>
                 <td>{{model.size}} MB</td>
                 <td><a target="_blank" ng-href="{{model.reference}}">Reference</a> //
-                    <a ng-href="" ng-if="model.demoUrl" class="link" ng-click="openModal(model)">Demo</a></td>
+                    <a ng-href="" ng-if="model.demoUrl && model.demoUrl.indexOf('http') == -1" class="link" ng-click="openModal(model)">Demo</a>
+                    <a ng-href="{{model.demoUrl}}" target="_blank" ng-if="model.demoUrl && model.demoUrl.indexOf('http') > -1" class="link">Demo</a></td>
             </tr>
             </tbody>
         </table>
