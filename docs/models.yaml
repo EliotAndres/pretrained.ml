@@ -62,7 +62,7 @@ models:
     demoUrl: 'ssd-inception'
   -
     name: DenseNet
-    description: A convnet where outputs from preivous layers are all concatenated, rather than summed, and fed forward to the next layer. Transition layers help reduce the size of the model.
+    description: A densely connected convolutional network architecture, in which each layer in the network receives signals from all previous layers. The channel-wise inputs to each layer are the concatenated, rather than summed, outputs of previous layers.
     type: Computer Vision
     subtype: Object Detection
     size: 3840
