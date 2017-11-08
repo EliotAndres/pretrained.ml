@@ -60,3 +60,10 @@ models:
     size: 445
     reference: https://github.com/tensorflow/models/tree/master/research/object_detection
     demoUrl: 'ssd-inception'
+  -
+    name: DenseNet
+    description: A convnet where outputs from preivous layers are all concatenated, rather than summed, and fed forward to the next layer. Transition layers help reduce the size of the model.
+    type: Computer Vision
+    subtype: Object Detection
+    size: 3840
+    reference: https://github.com/liuzhuang13/DenseNet  
