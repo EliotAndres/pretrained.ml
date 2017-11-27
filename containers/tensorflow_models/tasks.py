@@ -31,7 +31,7 @@ def task_run_handler(sender=None, task_id=None, task=None, args=None, retval=Non
     redis_instance.lrem('task_queue', 1, task_id)
 
     data, session_id = retval
-    # TODO: url in params
+
     requests.post(BASE_URL + 'notify_client',
                   data={'session_id': session_id, 'predictions': data, 'task_id': task_id})
 

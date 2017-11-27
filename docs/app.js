@@ -38,10 +38,10 @@ app
         });
 
         socket.on('finished_job', function(data) {
-            $scope.loading = false;
             // If the user closed the modal and opened a new one before task returned
             if (data.taskId === $scope.currentTaskId) {
                 $timeout(function () {
+                    $scope.loading = false;
                     $scope.predictions = JSON.parse(data.predictions);
                 });
             }
