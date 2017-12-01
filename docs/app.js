@@ -1,9 +1,11 @@
 var app = angular.module('app', ['tableSort', 'pathgather.popeye', 'ngFileUpload']);
 
+var mainUrl = 'http://149.202.173.21';
+
 app
     .controller('MainController', function MainController($scope, $http, Popeye, Upload, $timeout) {
-        var socket = io.connect('http://s2.ndres.me:8091');
-        $scope.serverUrl = 'http://s2.ndres.me:8091/outputs/';
+        var socket = io.connect(mainUrl + ':8091');
+        $scope.serverUrl = mainUrl + ':8091/outputs/';
         $scope.models = [];
         $scope.form = {};
         $scope.icons = {'Computer Vision': 'computer_vision.png',
@@ -81,7 +83,7 @@ app
 
         $scope.uploadImage = function (files, file) {
             Upload.upload({
-                url: 'http://s2.ndres.me:8091/' + $scope.currentModel.demoUrl,
+                url: mainUrl + ':8091/' + $scope.currentModel.demoUrl,
                 data: {file: file, 'sessionId': $scope.sessionId}
             }).progress(function(event) {
                 $scope.uploadProgress = parseInt(100.0 * event.loaded / event.total);
@@ -97,7 +99,7 @@ app
 
             $http({
                 method: 'POST',
-                url: 'http://s2.ndres.me:8091/' + $scope.currentModel.demoUrl,
+                url: mainUrl + ':8091/' + $scope.currentModel.demoUrl,
                 data: 'text=' + text + '&sessionId=' + $scope.sessionId,
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             }).then(function (response) {
