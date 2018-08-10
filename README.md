@@ -1,5 +1,8 @@
-# pretrained.ml
-Sortable and searchable compilation of pre-trained deep learning models. With demos and code.
+# [DEPRECATED] pretrained.ml
+
+[DEPRECATED] Sortable and searchable compilation of pre-trained deep learning models. With demos and code.
+
+**DEPRECATED**: You can find an alternative here [modelzoo.co](http://modelzoo.co)
 
 ## A word of warning
 This is running on a server without GPU, hence it seems slow.
